@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="theme-color" content="#2c3e50">
     <title>Walls And Dreams - Interior Design Excellence</title>
     <meta name="description" content="Transform your space with Walls And Dreams. Expert interior design, custom furniture, and renovation services in Kurnool, Andhra Pradesh.">
     <link rel="icon" type="image/x-icon" href="img/WDLogo.ico">
@@ -14,6 +16,7 @@
     
     <!-- Custom CSS -->
     <link href="css/modern-style.css" rel="stylesheet">
+    <link href="css/projects.css" rel="stylesheet">
     
     <!-- AOS Animation Library -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
@@ -518,18 +521,45 @@
         </div>
     </footer>
 
-    <!-- Project Details Popup -->
-    <div class="project-popup" id="projectPopup">
-        <div class="popup-content">
-            <button class="popup-close" id="popupClose">
-                <i class="fas fa-times"></i>
-            </button>
-            <img src="" alt="" class="popup-image" id="popupImage">
-            <div class="popup-details">
-                <h3 class="popup-title" id="popupTitle"></h3>
-                <p class="popup-description" id="popupDescription"></p>
-                <div class="popup-meta" id="popupMeta"></div>
-                <span class="popup-category" id="popupCategory"></span>
+    <!-- Project Modal -->
+    <div class="modal fade" id="projectModal" tabindex="-1" aria-labelledby="projectModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="projectModalLabel">Project Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="project-modal-content">
+                        <div class="project-modal-image">
+                            <img src="" alt="Project Image" class="img-fluid" id="modalProjectImage">
+                        </div>
+                        <div class="project-modal-details">
+                            <h4 id="modalProjectTitle"></h4>
+                            <p id="modalProjectDescription"></p>
+                            <div class="project-modal-meta">
+                                <div class="meta-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <span id="modalProjectDate"></span>
+                                </div>
+                                <div class="meta-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span id="modalProjectLocation"></span>
+                                </div>
+                                <div class="meta-item">
+                                    <i class="fas fa-tag"></i>
+                                    <span id="modalProjectCategory"></span>
+                                </div>
+                            </div>
+                            <div class="project-modal-actions">
+                                <a href="https://www.youtube.com/@wallsanddreams" target="_blank" class="btn btn-danger">
+                                    <i class="fab fa-youtube"></i> Watch on YouTube
+                                </a>
+                                <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

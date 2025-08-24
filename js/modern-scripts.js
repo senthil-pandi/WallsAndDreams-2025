@@ -51,11 +51,17 @@ function typeText() {
 function initParallaxEffect() {
     const heroBackground = document.querySelector('.hero-background');
     if (heroBackground) {
-        window.addEventListener('scroll', () => {
-            const scrolled = window.pageYOffset;
-            const rate = scrolled * -0.6;
-            heroBackground.style.transform = `translateY(${rate}px)`;
-        });
+        // Only enable parallax on desktop devices
+        if (window.innerWidth > 768) {
+            window.addEventListener('scroll', () => {
+                const scrolled = window.pageYOffset;
+                const rate = scrolled * -0.6;
+                heroBackground.style.transform = `translateY(${rate}px)`;
+            });
+        } else {
+            // Disable parallax on mobile for better performance
+            heroBackground.style.transform = 'none';
+        }
     }
 }
 
@@ -69,10 +75,28 @@ function initSmoothScrolling() {
             const targetSection = document.querySelector(targetId);
             if (targetSection) {
                 const offsetTop = targetSection.offsetTop - 80;
-                window.scrollTo({
-                    top: offsetTop,
-                    behavior: 'smooth'
-                });
+                
+                // Use smooth scrolling only on desktop, instant scroll on mobile for better performance
+                if (window.innerWidth > 768) {
+                    window.scrollTo({
+                        top: offsetTop,
+                        behavior: 'smooth'
+                    });
+                } else {
+                    window.scrollTo({
+                        top: offsetTop,
+                        behavior: 'auto'
+                    });
+                }
+                
+                // Close mobile navigation if open
+                const navbarCollapse = document.querySelector('.navbar-collapse');
+                if (navbarCollapse && navbarCollapse.classList.contains('show')) {
+                    const navbarToggler = document.querySelector('.navbar-toggler');
+                    if (navbarToggler) {
+                        navbarToggler.click();
+                    }
+                }
             }
         });
     });
@@ -638,9 +662,145 @@ function showNotification(message, type = 'info') {
 
 
 
-// ===== PROJECT POPUP FUNCTIONALITY =====
-// This functionality is now handled in projects.js for the allProjects page
-// Keeping this for other pages that might need it
+// ===== PORTFOLIO PROJECT DATA =====
+window.portfolioProjectData = {
+    1: {
+        title: "Kids Bedroom",
+        description: "Playful and functional design that creates the perfect environment for children to sleep, play, and grow. This project features custom storage solutions, vibrant colors, and child-safe materials that make the room both beautiful and practical.",
+        image: "img/kidsBedroom.jpg",
+        category: "interior",
+        date: "March 2024",
+        location: "Kurnool, Andhra Pradesh",
+        area: "200 sq ft",
+        details: "Complete bedroom transformation with custom furniture, playful wall designs, and functional storage solutions."
+    },
+    2: {
+        title: "Classic Custom Sofa",
+        description: "Timeless elegance meets comfort in this bespoke sofa design. Every detail was carefully crafted to create a piece that not only looks stunning but provides exceptional comfort for years to come.",
+        image: "img/ClassicCustomSofa.jpg",
+        category: "furniture",
+        date: "February 2024",
+        location: "Kurnool, Andhra Pradesh",
+        material: "Premium Fabric & Wood",
+        details: "Custom sofa design with premium materials, ergonomic design, and expert craftsmanship."
+    },
+    3: {
+        title: "Modern Living Room",
+        description: "Contemporary sophistication that transforms your living space into a modern haven. This design combines clean lines, neutral tones, and functional furniture to create a space that's both stylish and comfortable.",
+        image: "img/interiorDesign1.jpg",
+        category: "interior",
+        date: "January 2024",
+        location: "Kurnool, Andhra Pradesh",
+        area: "350 sq ft",
+        details: "Complete living room design with modern furniture, lighting, and sophisticated color palette."
+    },
+    4: {
+        title: "Kitchen Renovation",
+        description: "Complete transformation that turns your kitchen into a functional and beautiful space. This renovation project includes modern appliances, efficient storage solutions, and a design that makes cooking a pleasure.",
+        image: "img/remodeling.jpg",
+        category: "renovation",
+        date: "December 2023",
+        location: "Kurnool, Andhra Pradesh",
+        area: "250 sq ft",
+        details: "Full kitchen renovation with new cabinets, countertops, appliances, and improved layout."
+    }
+};
+
+// ===== PORTFOLIO PROJECT MODAL FUNCTIONALITY =====
+function initPortfolioProjectModals() {
+    const viewButtons = document.querySelectorAll('.view-project-btn');
+    
+    console.log(`Found ${viewButtons.length} portfolio view buttons`);
+    
+    viewButtons.forEach(button => {
+        const projectId = button.getAttribute('data-project');
+        console.log(`Initializing button for project ${projectId}`);
+        
+        button.addEventListener('click', function() {
+            const projectId = this.getAttribute('data-project');
+            console.log(`Portfolio button clicked for project ${projectId}`);
+            showPortfolioProjectModal(projectId);
+        });
+        
+        // Add keyboard navigation support
+        button.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                this.click();
+            }
+        });
+        
+        // Add ARIA labels for accessibility
+        const project = portfolioProjectData[projectId];
+        if (project) {
+            button.setAttribute('aria-label', `View details for ${project.title}`);
+        } else {
+            console.warn(`Project data not found for ID ${projectId}`);
+        }
+    });
+}
+
+function showPortfolioProjectModal(projectId) {
+    const project = portfolioProjectData[projectId];
+    if (!project) {
+        console.error(`Project with ID ${projectId} not found`);
+        return;
+    }
+    
+    // Update modal content
+    const modal = document.getElementById('projectModal');
+    if (modal) {
+        try {
+            document.getElementById('modalProjectImage').src = project.image;
+            document.getElementById('modalProjectTitle').textContent = project.title;
+            document.getElementById('modalProjectDescription').textContent = project.description;
+            document.getElementById('modalProjectDate').textContent = project.date;
+            document.getElementById('modalProjectLocation').textContent = project.location;
+            document.getElementById('modalProjectCategory').textContent = project.category.charAt(0).toUpperCase() + project.category.slice(1);
+            
+            // Show modal
+            const modalInstance = new bootstrap.Modal(modal);
+            modalInstance.show();
+            
+            // Track project view for analytics
+            trackPortfolioProjectView(projectId);
+        } catch (error) {
+            console.error('Error showing portfolio project modal:', error);
+        }
+    } else {
+        console.error('Project modal element not found');
+    }
+}
+
+// ===== ANALYTICS TRACKING =====
+function trackPortfolioProjectView(projectId) {
+    // Track portfolio project views for analytics
+    if (typeof gtag !== 'undefined') {
+        gtag('event', 'view_portfolio_project', {
+            'project_id': projectId,
+            'project_title': portfolioProjectData[projectId]?.title
+        });
+    }
+    
+    // Portfolio project view tracked
+    console.log(`Portfolio project ${projectId} viewed: ${portfolioProjectData[projectId]?.title}`);
+}
+
+// ===== KEYBOARD NAVIGATION FOR PORTFOLIO MODAL =====
+function initPortfolioKeyboardNavigation() {
+    document.addEventListener('keydown', function(e) {
+        // ESC key to close modal
+        if (e.key === 'Escape') {
+            const modal = document.getElementById('projectModal');
+            if (modal && modal.classList.contains('show')) {
+                const modalInstance = bootstrap.Modal.getInstance(modal);
+                if (modalInstance) {
+                    modalInstance.hide();
+                }
+            }
+        }
+    });
+}
 
 // ===== CAROUSEL NAVIGATION =====
 function initCarouselNavigation() {
@@ -652,25 +812,78 @@ function initCarouselNavigation() {
         return;
     }
     
-    const scrollAmount = 400;
+    // Adjust scroll amount and behavior based on device
+    const scrollAmount = window.innerWidth > 768 ? 400 : 300;
+    const scrollBehavior = window.innerWidth > 768 ? 'smooth' : 'auto';
     
     prevBtn.addEventListener('click', () => {
         carousel.scrollBy({
             left: -scrollAmount,
-            behavior: 'smooth'
+            behavior: scrollBehavior
         });
     });
     
     nextBtn.addEventListener('click', () => {
         carousel.scrollBy({
             left: scrollAmount,
-            behavior: 'smooth'
+            behavior: scrollBehavior
         });
     });
+    
+    // Mobile touch scrolling improvements
+    if (window.innerWidth <= 768) {
+        let isScrolling = false;
+        let startX = 0;
+        let scrollLeft = 0;
+        
+        carousel.addEventListener('touchstart', (e) => {
+            isScrolling = true;
+            startX = e.touches[0].pageX - carousel.offsetLeft;
+            scrollLeft = carousel.scrollLeft;
+        });
+        
+        carousel.addEventListener('touchmove', (e) => {
+            if (!isScrolling) return;
+            e.preventDefault();
+            const x = e.touches[0].pageX - carousel.offsetLeft;
+            const walk = (x - startX) * 2;
+            carousel.scrollLeft = scrollLeft - walk;
+        });
+        
+        carousel.addEventListener('touchend', () => {
+            isScrolling = false;
+        });
+    }
+}
+
+// ===== MOBILE DETECTION AND OPTIMIZATION =====
+function isMobileDevice() {
+    return window.innerWidth <= 768;
+}
+
+function optimizeForMobile() {
+    if (isMobileDevice()) {
+        // Disable heavy animations on mobile
+        document.body.classList.add('mobile-device');
+        
+        // Optimize images for mobile
+        const images = document.querySelectorAll('img');
+        images.forEach(img => {
+            img.loading = 'lazy';
+        });
+        
+        // Reduce motion for better performance
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            document.body.classList.add('reduced-motion');
+        }
+    }
 }
 
 // ===== INITIALIZE ALL FEATURES =====
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize mobile optimization first
+    optimizeForMobile();
+    
     // Initialize existing features
     initAutoTyping();
     initParallaxEffect();
@@ -685,14 +898,17 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize new features
     initCarouselNavigation();
+    initPortfolioProjectModals();
+    initPortfolioKeyboardNavigation();
     
-    // Initialize AOS
+    // Initialize AOS with mobile optimization
     if (typeof AOS !== 'undefined') {
         AOS.init({
-            duration: 800,
+            duration: window.innerWidth > 768 ? 800 : 600,
             easing: 'ease-in-out',
             once: true,
-            offset: 100
+            offset: window.innerWidth > 768 ? 100 : 50,
+            disable: window.innerWidth <= 768 ? 'mobile' : false
         });
     }
 });
